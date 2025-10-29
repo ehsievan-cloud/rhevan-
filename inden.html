@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pengguna</title>
+    <style>
+        /* --- Bagian Kode CSS --- */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .profile-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .profile-header {
+            margin-bottom: 20px;
+        }
+
+        #profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
+            margin-bottom: 10px;
+        }
+
+        #user-name {
+            font-size: 24px;
+            color: #333;
+            margin: 10px 0 5px;
+        }
+
+        #user-bio {
+            font-size: 14px;
+            color: #777;
+            margin: 0;
+        }
+
+        .profile-details {
+            text-align: left;
+            margin-bottom: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        #edit-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #edit-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Styling untuk modal (pop-up form) */
+        .modal {
+            display: none; /* Sembunyikan secara default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #profile-form label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        #profile-form input, #profile-form textarea {
+            width: 95%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #profile-form button {
+            width: 100%;
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <div class="profile-header">
+            <img id="profile-pic" src="https://via.placeholder.com/150" alt="Foto Profil">
+            <h1 id="user-name">Nama Pengguna</h1>
+            <p id="user-bio">Bio singkat tentang pengguna.</p>
+        </div>
+        <div class="profile-details">
+            <div class="info-item">
+                <span class="label">Email:</span>
+                <span id="user-email">email@example.com</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Lokasi:</span>
+                <span id="user-location">Kota, Negara</span>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button id="edit-btn">Edit Profil</button>
+        </div>
+    </div>
+
+    <!-- Formulir edit yang akan disembunyikan secara default -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Edit Profil</h2>
+            <form id="profile-form">
+                <label for="name-input">Nama:</label>
+                <input type="text" id="name-input" required>
+
+                <label for="bio-input">Bio:</label>
+                <textarea id="bio-input" required></textarea>
+
+                <label for="email-input">Email:</label>
+                <input type="email" id="email-input" required>
+
+                <label for="location-input">Lokasi:</label>
+                <input type="text" id="location-input" required>
+
+                <button type="submit">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* --- Bagian Kode JavaScript --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ambil elemen-elemen HTML yang dibutuhkan
+            const editBtn = document.getElementById('edit-btn');
+            const editModal = document.getElementById('edit-modal');
+            const closeBtn = document.querySelector('.close-btn');
+            const profileForm = document.getElementById('profile-form');
+            
+            // Elemen untuk menampilkan data profil
+            const userNameElement = document.getElementById('user-name');
+            const userBioElement = document.getElementById('user-bio');
+            const userEmailElement = document.getElementById('user-email');
+            const userLocationElement = document.getElementById('user-location');
+
+            // Elemen untuk input di form
+            const nameInput = document.getElementById('name-input');
+            const bioInput = document.getElementById('bio-input');
+            const emailInput = document.getElementById('email-input');
+            const locationInput = document.getElementById('location-input');
+
+            // Contoh data profil awal
+            const profileData = {
+                name: 'Nama Pengguna',
+                bio: 'Bio singkat tentang pengguna.',
+                email: 'email@example.com',
+                location: 'Kota, Negara'
+            };
+
+            // Fungsi untuk memperbarui tampilan profil
+            function updateProfileView() {
+                userNameElement.textContent = profileData.name;
+                userBioElement.textContent = profileData.bio;
+                userEmailElement.textContent = profileData.email;
+                userLocationElement.textContent = profileData.location;
+            }
+
+            // Tampilkan profil saat pertama kali halaman dimuat
+            updateProfileView();
+
+            // Event listener untuk tombol "Edit Profil"
+            editBtn.addEventListener('click', () => {
+                // Isi form dengan data profil saat ini
+                nameInput.value = profileData.name;
+                bioInput.value = profileData.bio;
+                emailInput.value = profileData.email;
+                locationInput.value = profileData.location;
+                
+                // Tampilkan modal
+                editModal.style.display = 'block';
+            });
+
+            // Event listener untuk tombol tutup modal
+            closeBtn.addEventListener('click', () => {
+                // Sembunyikan modal
+                editModal.style.display = 'none';
+            });
+
+            // Event listener untuk menutup modal saat klik di luar area modal
+            window.addEventListener('click', (event) => {
+                if (event.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            });
+
+            // Event listener untuk form submission
+            profileForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Mencegah form melakukan reload halaman
+
+                // Perbarui objek data profil dengan nilai dari form
+                profileData.name = nameInput.value;
+                profileData.bio = bioInput.value;
+                profileData.email = emailInput.value;
+                profileData.location = locationInput.value;
+
+                // Perbarui tampilan profil di halaman
+                updateProfileView();
+
+                // Sembunyikan modal setelah submit
+                editModal.style.display = 'none';
+
+                alert('Profil berhasil diperbarui!');
+            });
+        });
+    </script>
+</body>
+</html>
